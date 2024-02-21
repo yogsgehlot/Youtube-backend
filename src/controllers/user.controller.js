@@ -7,7 +7,7 @@ const registerUser = asyncHandler(async (req, res) => {
     
   // get user details from frontend/postman
   const { fullName, email, username, password } = req.body;
-  console.log("email: ", email);
+  // console.log("email: ", email);
 
   //validation - not empty
   // can be used simple if else type code but we will use here some advanced code
@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   //check if user already exists {username, email}
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
   if (existedUser) {
@@ -27,8 +27,8 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // check for images and avatar
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
-
+  const coverImageLocalPath = req.files?.coverImage?.[0]?.path; //also cheked coverImage array got or not
+  // console.log(avatarLocalPath)
   if(!avatarLocalPath){
     throw new ApiError(400, "Avatar file is required")
   }
@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // upload them to cloudinary
   const avatar = await uploadOnCloudinary(avatarLocalPath)
   const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-
+  // console.log(avatar);
   if(!avatar){
     throw new ApiError(400, "Avatar file is required")
   }
